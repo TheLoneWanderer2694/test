@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roku Remote Control & Diagnostics Workstation</title>
+  <title>Roku Remote & Diagnostics Workstation</title>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Tailwind CSS -->
@@ -30,7 +30,6 @@
     };
   </script>
   <style>
-    /* Custom scrollbar styling */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -57,6 +56,12 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-roku-600 selection:text-white pb-12">
 
+  <!-- Hidden Iframe Target for Silent ECP Form Submissions (Bypasses CORS/Fetch Blocks) -->
+  <iframe name="ecp_target" id="ecp_target" class="hidden" style="display:none; width:0; height:0;"></iframe>
+
+  <!-- Hidden Dynamic Form for Fast Network Dispatching -->
+  <form id="ecpForm" method="POST" target="ecp_target" class="hidden"></form>
+
   <!-- Main Container -->
   <div class="max-w-7xl mx-auto px-4 py-6">
     
@@ -69,9 +74,9 @@
         <div>
           <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             Roku Remote Workstation
-            <span class="text-xs bg-roku-900/80 text-roku-300 border border-roku-700/50 px-2 py-0.5 rounded-full font-mono">v2.5 ECP</span>
+            <span class="text-xs bg-roku-900/80 text-roku-300 border border-roku-700/50 px-2 py-0.5 rounded-full font-mono">v3.0 Ultra</span>
           </h1>
-          <p class="text-xs text-slate-400">Direct Network ECP Remote, Diagnostics & Sync Utility</p>
+          <p class="text-xs text-slate-400">Direct Network ECP Remote & Diagnostics Utility</p>
         </div>
       </div>
 
@@ -79,7 +84,7 @@
       <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 p-1.5 rounded-xl shadow-inner">
         <div class="relative flex-1 sm:w-64">
           <i data-lucide="wifi" class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
-          <input type="text" id="targetIpInput" placeholder="Roku IP (e.g. 192.168.1.100)" 
+          <input type="text" id="targetIpInput" placeholder="Roku IP (e.g. 192.168.10.108)" 
                  class="w-full bg-slate-950 text-xs text-slate-100 pl-9 pr-3 py-2 rounded-lg border border-slate-800 focus:outline-none focus:border-roku-500 font-mono">
         </div>
         <button id="btnConnect" onclick="connectDevice()" class="px-3 py-2 bg-roku-600 hover:bg-roku-500 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition btn-active shadow-md">
@@ -94,15 +99,15 @@
     <!-- Main Grid Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-      <!-- LEFT COLUMN: Physical-Style Remote Control (4 Cols) -->
+      <!-- LEFT COLUMN: Remote Control (4 Cols) -->
       <div class="lg:col-span-5 flex flex-col items-center">
         <div class="w-full max-w-xs bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl remote-glow relative">
           
           <!-- Connection Status Indicator -->
           <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/80">
             <div class="flex items-center gap-2">
-              <span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-              <span id="statusText" class="text-xs font-mono text-slate-400">Connecting...</span>
+              <span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <span id="statusText" class="text-xs font-mono text-emerald-400">Ready</span>
             </div>
             <button onclick="sendKey('Power')" title="Power Toggle" class="w-9 h-9 rounded-full bg-red-950/60 hover:bg-red-900 border border-red-800/60 text-red-400 hover:text-red-200 flex items-center justify-center transition btn-active shadow-sm">
               <i data-lucide="power" class="w-4 h-4"></i>
@@ -119,122 +124,9 @@
             </button>
           </div>
 
-          <!-- D-PAD / Directional Cluster -->
+          <!-- D-PAD Cluster -->
           <div class="relative w-56 h-56 mx-auto my-4 bg-slate-950 rounded-full border border-slate-800 shadow-inner flex items-center justify-center p-3">
-            <!-- D-Pad Up -->
             <button onclick="sendKey('Up')" class="absolute top-2 w-14 h-12 bg-slate-800 hover:bg-roku-700 text-slate-200 rounded-t-2xl flex items-center justify-center transition btn-active">
               <i data-lucide="chevron-up" class="w-6 h-6"></i>
             </button>
-            <!-- D-Pad Down -->
-            <button onclick="sendKey('Down')" class="absolute bottom-2 w-14 h-12 bg-slate-800 hover:bg-roku-700 text-slate-200 rounded-b-2xl flex items-center justify-center transition btn-active">
-              <i data-lucide="chevron-down" class="w-6 h-6"></i>
-            </button>
-            <!-- D-Pad Left -->
-            <button onclick="sendKey('Left')" class="absolute left-2 w-12 h-14 bg-slate-800 hover:bg-roku-700 text-slate-200 rounded-l-2xl flex items-center justify-center transition btn-active">
-              <i data-lucide="chevron-left" class="w-6 h-6"></i>
-            </button>
-            <!-- D-Pad Right -->
-            <button onclick="sendKey('Right')" class="absolute right-2 w-12 h-14 bg-slate-800 hover:bg-roku-700 text-slate-200 rounded-r-2xl flex items-center justify-center transition btn-active">
-              <i data-lucide="chevron-right" class="w-6 h-6"></i>
-            </button>
-            <!-- D-Pad Center OK -->
-            <button onclick="sendKey('Select')" class="w-16 h-16 rounded-full bg-roku-600 hover:bg-roku-500 text-white font-bold text-sm shadow-md flex items-center justify-center transition btn-active border border-roku-400/30">
-              OK
-            </button>
-          </div>
-
-          <!-- Utility Bar (* Option, Replay, Info) -->
-          <div class="grid grid-cols-3 gap-2 my-4">
-            <button onclick="sendKey('InstantReplay')" title="Instant Replay" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center transition btn-active border border-slate-800">
-              <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-            </button>
-            <button onclick="sendKey('Info')" title="Options (*)" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg flex items-center justify-center font-bold text-base transition btn-active border border-slate-800">
-              ✱
-            </button>
-            <button onclick="sendKey('Search')" title="Search" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center transition btn-active border border-slate-800">
-              <i data-lucide="search" class="w-4 h-4"></i>
-            </button>
-          </div>
-
-          <!-- Playback & Media Controls -->
-          <div class="grid grid-cols-3 gap-2 mb-4 bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
-            <button onclick="sendKey('Rev')" title="Rewind" class="py-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg flex items-center justify-center transition btn-active">
-              <i data-lucide="rewind" class="w-4 h-4"></i>
-            </button>
-            <button onclick="sendKey('Play')" title="Play / Pause" class="py-2.5 bg-roku-600 hover:bg-roku-500 text-white rounded-lg flex items-center justify-center transition btn-active shadow">
-              <i data-lucide="play" class="w-4 h-4"></i>
-            </button>
-            <button onclick="sendKey('Fwd')" title="Fast Forward" class="py-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg flex items-center justify-center transition btn-active">
-              <i data-lucide="fast-forward" class="w-4 h-4"></i>
-            </button>
-          </div>
-
-          <!-- TV Audio & Input Controls -->
-          <div class="grid grid-cols-4 gap-1.5 pt-2 border-t border-slate-800">
-            <button onclick="sendKey('VolumeDown')" title="Volume Down" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center transition btn-active text-xs">
-              <i data-lucide="volume-1" class="w-3.5 h-3.5"></i>
-            </button>
-            <button onclick="sendKey('VolumeMute')" title="Mute" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center transition btn-active text-xs">
-              <i data-lucide="volume-x" class="w-3.5 h-3.5"></i>
-            </button>
-            <button onclick="sendKey('VolumeUp')" title="Volume Up" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center transition btn-active text-xs">
-              <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
-            </button>
-            <button onclick="sendKey('InputTuner')" title="TV Tuner / Antenna" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center transition btn-active text-xs">
-              <i data-lucide="tv" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- RIGHT COLUMN: Diagnostics, App Launcher, Keyboard & Tools (7 Cols) -->
-      <div class="lg:col-span-7 flex flex-col gap-6">
-
-        <!-- Tab Controls Header -->
-        <div class="flex items-center gap-2 border-b border-slate-800 pb-2 overflow-x-auto">
-          <button onclick="switchTab('apps')" id="tab-apps" class="px-4 py-2 rounded-lg text-xs font-medium bg-roku-600 text-white flex items-center gap-2 transition">
-            <i data-lucide="layout-grid" class="w-4 h-4"></i> Installed Channels
-          </button>
-          <button onclick="switchTab('text')" id="tab-text" class="px-4 py-2 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white flex items-center gap-2 transition">
-            <i data-lucide="keyboard" class="w-4 h-4"></i> Text & Search
-          </button>
-          <button onclick="switchTab('info')" id="tab-info" class="px-4 py-2 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white flex items-center gap-2 transition">
-            <i data-lucide="info" class="w-4 h-4"></i> Device Specs
-          </button>
-          <button onclick="switchTab('macros')" id="tab-macros" class="px-4 py-2 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white flex items-center gap-2 transition">
-            <i data-lucide="play-square" class="w-4 h-4"></i> Sequence Macros
-          </button>
-          <button onclick="switchTab('scanner')" id="tab-scanner" class="px-4 py-2 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white flex items-center gap-2 transition">
-            <i data-lucide="radar" class="w-4 h-4"></i> Subnet Scanner
-          </button>
-        </div>
-
-        <!-- TAB CONTENT 1: Installed Channels & Apps -->
-        <div id="content-apps" class="space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
-              <i data-lucide="grid" class="w-4 h-4 text-roku-400"></i> App Catalog
-            </h3>
-            <span id="appCountText" class="text-xs text-slate-500 font-mono">0 channels loaded</span>
-          </div>
-
-          <!-- Apps Grid Container -->
-          <div id="appsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[480px] overflow-y-auto p-1">
-            <!-- App cards inserted dynamically -->
-            <div class="col-span-full py-12 text-center text-slate-500 text-xs">
-              Connect to a device to load channels or view defaults...
-            </div>
-          </div>
-        </div>
-
-        <!-- TAB CONTENT 2: Direct Text & Type Writer -->
-        <div id="content-text" class="hidden space-y-4">
-          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
-            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Direct Character Typing</h3>
-            <p class="text-xs text-slate-400">Type text below to stream characters directly to active search boxes on your Roku.</p>
-            
-            <div class="flex gap-2">
-              <input type="text" id="typeTextInput" placeholder="Type text to send to TV..." 
-                     class="flex-1 bg-slate-950 border border-slate-800 text-sm text-slate-100 rounded-lg px-3 py-2 focus:outline-none focus:border-roku-500">
-              <button onclick="sendTypedText()" class="px-4 py-2 bg-roku-600 hover:bg-roku-500 text-white rounded-lg text-xs font-medium btn-active flex items-center gap-1
+            <button onclick="sendKey('Down')" class="absolute bottom-2 w-14 h-12 bg-slate-800 hover:bg-roku-700 text-slate-200 rounded-b-
