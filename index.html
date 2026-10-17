@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roku Virtual Remote</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0c10;
+            color: #e0e0e0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Glossy & Tactile Dark Remote Styling */
+        .remote-casing {
+            background: linear-gradient(145deg, #1f2229, #121418);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                        inset 0 1px 1px 0 rgba(255, 255, 255, 0.1),
+                        0 0 0 1px rgba(255, 255, 255, 0.05);
+            border-radius: 40px;
+        }
+
+        /* Tactile Button Effects */
+        .btn-tactile {
+            background: linear-gradient(145deg, #2a2e37, #1a1c23);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.08s ease;
+        }
+
+        .btn-tactile:active, .btn-tactile.active-press {
+            transform: translateY(2px);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5),
+                        inset 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+            background: linear-gradient(145deg, #1a1c23, #2a2e37);
+        }
+
+        /* Purple Roku Accent Button */
+        .btn-purple {
+            background: linear-gradient(145deg, #7c3aed, #5b21b6);
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3),
+                        inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-purple:active, .btn-purple.active-press {
+            transform: translateY(2px);
+            box-shadow: 0 1px 3px rgba(124, 58, 237, 0.3),
+                        inset 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+            background: linear-gradient(145deg, #5b21b6, #7c3aed);
+        }
+
+        /* Power Button Special */
+        .btn-power {
+            background: linear-gradient(145deg, #dc2626, #991b1b);
+            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.25);
+        }
+        .btn-power:active, .btn-power.active-press {
+            transform: translateY(2px);
+            box-shadow: 0 1px 2px rgba(220, 38, 38, 0.2);
+            background: linear-gradient(145deg, #991b1b, #dc2626);
+        }
+
+        /* Directional Pad Center */
+        .dpad-center {
+            background: radial-gradient(circle, #2d323e 0%, #1a1c23 100%);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.6), 0 1px 1px rgba(255,255,255,0.05);
+        }
+
+        /* App Button Custom Colors */
+        .btn-netflix { background: #E50914; color: white; }
+        .btn-youtube { background: #FF0000; color: white; }
+        .btn-hulu { background: #1CE783; color: #0B0C10; }
+        .btn-disney { background: #113CCF; color: white; }
+        .btn-prime { background: #00A8E1; color: white; }
+        .btn-apple { background: #333333; color: white; }
+
+        /* Custom Scrollbar for Logs */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center p-4 sm:p-6">
+
+    <!-- Header / Brand -->
+    <header class="w-full max-w-4xl flex justify-between items-center mb-4">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl font-bold tracking-wider text-purple-500 flex items-center gap-2">
+                <i class="fa-solid fa-tv"></i> ROKU <span class="text-xs text-gray-400 font-normal px-2 py-0.5 bg-gray-800 rounded-full border border-gray-700">ECP Remote</span>
+            </span>
+        </div>
+        <button id="toggleInfoBtn" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-700 transition flex items-center gap-1">
+            <i class="fa-solid fa-circle-info text-purple-400"></i> Setup & CORS Help
+        </button>
+    </header>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-4xl flex flex-col lg:flex-row items-start justify-center gap-8">
+        
+        <!-- REMOTE CONTROLLER UI -->
+        <div class="remote-casing w-full max-w-[320px] mx-auto p-6 flex flex-col items-center gap-5 border border-gray-800 relative">
+            
+            <!-- Top Controls (Power & Settings Status) -->
+            <div class="w-full flex justify-between items-center px-2">
+                <div class="flex items-center space-x-2">
+                    <span id="statusIndicator" class="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" title="Checking status..."></span>
+                    <span id="statusText" class="text-xs font-mono text-gray-400">Connecting...</span>
+                </div>
+                <button data-key="Power" class="btn-power text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-md">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+
+            <!-- Upper Navigation (Back & Home) -->
+            <div class="w-full grid grid-cols-2 gap-4 px-2">
+                <button data-key="Back" class="btn-tactile h-12 rounded-2xl flex items-center justify-center text-gray-200 hover:text-white">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <button data-key="Home" class="btn-purple h-12 rounded-2xl flex items-center justify-center text-white font-semibold">
+                    <i class="fa-solid fa-house text-lg"></i>
+                </button>
+            </div>
+
+            <!-- D-PAD / Directional Cross -->
+            <div class="relative w-56 h-56 rounded-full dpad-center p-2 flex items-center justify-center border border-gray-700/50">
+                <!-- Up -->
+                <button data-key="Up" class="btn-tactile absolute top-2 w-14 h-14 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-caret-up text-2xl"></i>
+                </button>
+                
+                <!-- Left -->
+                <button data-key="Left" class="btn-tactile absolute left-2 w-14 h-14 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-caret-left text-2xl"></i>
+                </button>
+
+                <!-- OK / Select -->
+                <button data-key="Select" class="btn-purple w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-inner tracking-wide">
+                    OK
+                </button>
+
+                <!-- Right -->
+                <button data-key="Right" class="btn-tactile absolute right-2 w-14 h-14 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-caret-right text-2xl"></i>
+                </button>
+
+                <!-- Down -->
+                <button data-key="Down" class="btn-tactile absolute bottom-2 w-14 h-14 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-caret-down text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Instant Replay & Options (*) -->
+            <div class="w-full grid grid-cols-2 gap-4 px-2">
+                <button data-key="InstantReplay" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-gray-300 hover:text-white" title="Instant Replay">
+                    <i class="fa-solid fa-rotate-left text-md"></i>
+                </button>
+                <button data-key="Info" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-gray-300 hover:text-white" title="Options / Info">
+                    <i class="fa-solid fa-asterisk text-md"></i>
+                </button>
+            </div>
+
+            <!-- Playback Controls -->
+            <div class="w-full grid grid-cols-3 gap-3 px-2">
+                <button data-key="Rev" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-backward text-md"></i>
+                </button>
+                <button data-key="Play" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-play-pause text-md"></i>
+                </button>
+                <button data-key="Fwd" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-forward text-md"></i>
+                </button>
+            </div>
+
+            <!-- Volume Controls -->
+            <div class="w-full grid grid-cols-3 gap-3 px-2 border-t border-gray-800/80 pt-4">
+                <button data-key="VolumeDown" class="btn-tactile h-10 rounded-xl flex items-center justify-center text-gray-300 hover:text-white" title="Volume Down">
+                    <i class="fa-solid fa-volume-low text-sm"></i>
+                </button>
+                <button data-key="VolumeMute" class="btn-tactile h-10 rounded-xl flex items-center justify-center text-gray-300 hover:text-white" title="Mute">
+                    <i class="fa-solid fa-volume-xmark text-sm"></i>
+                </button>
+                <button data-key="VolumeUp" class="btn-tactile h-10 rounded-xl flex items-center justify-center text-gray-300 hover:text-white" title="Volume Up">
+                    <i class="fa-solid fa-volume-high text-sm"></i>
+                </button>
+            </div>
+
+            <!-- App Shortcuts -->
+            <div class="w-full grid grid-cols-2 gap-2.5 px-2 pt-2 border-t border-gray-800/80">
+                <button data-app="12" class="btn-netflix h-9 rounded-lg font-bold text-xs tracking-wider uppercase shadow hover:opacity-90 transition">
+                    Netflix
+                </button>
+                <button data-app="837" class="btn-youtube h-9 rounded-lg font-bold text-xs tracking-wider uppercase shadow hover:opacity-90 transition flex items-center justify-center gap-1">
+                    <i class="fa-brands fa-youtube text-sm"></i> YouTube
+                </button>
+                <button data-app="2285" class="btn-hulu h-9 rounded-lg font-bold text-xs tracking-wider uppercase shadow hover:opacity-90 transition">
+                    Hulu
+                </button>
+                <button data-app="291097" class="btn-disney h-9 rounded-lg font-bold text-xs tracking-wider uppercase shadow hover:opacity-90 transition">
+                    Disney+
+                </button>
+            </div>
+
+            <div class="text-[10px] text-gray-600 tracking-widest font-semibold mt-1">ROKU REMOTE</div>
+        </div>
+
+        <!-- RIGHT PANEL: CONFIG, TEXT INPUT, LOGS -->
+        <div class="flex-1 w-full flex flex-col gap-5">
+            
+            <!-- Connection & Settings Box -->
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-lg">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-network-wired text-purple-400"></i> Target Device Configuration
+                </h2>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-1">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500 text-xs font-mono">http://</span>
+                        <input type="text" id="rokuIp" placeholder="192.168.1.100" class="w-full pl-16 pr-4 py-2 bg-gray-950 border border-gray-800 rounded-xl text-sm font-mono text-purple-300 focus:outline-none focus:border-purple-500">
+                    </div>
+                    <button id="saveIpBtn" class="bg-purple-600 hover:bg-purple-500 text-white font-medium px-5 py-2 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plug"></i> Connect / Ping
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">
+                    Enter your Roku local IP address (Found in Roku Settings > Network > About). ECP Port: 8060.
+                </p>
+            </div>
+
+            <!-- Direct Text Entry Section -->
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-lg">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-keyboard text-purple-400"></i> Keyboard Search / Text Entry
+                </h2>
+                <p class="text-xs text-gray-400 mb-3">Type below to send keystrokes live to on-screen text fields on your Roku.</p>
+                
+                <div class="flex gap-2">
+                    <input type="text" id="textInput" placeholder="Type search query here..." class="flex-1 px-4 py-2 bg-gray-950 border border-gray-800 rounded-xl text-sm text-gray-200 focus:outline-none focus:border-purple-500">
+                    <button id="sendTextBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 font-medium px-4 py-2 rounded-xl text-sm transition flex items-center gap-1">
+                        <i class="fa-solid fa-paper-plane text-xs"></i> Send
+                    </button>
+                    <button id="clearTextBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-400 font-medium px-3 py-2 rounded-xl text-sm transition" title="Clear Field & Backspace Roku">
+                        <i class="fa-solid fa-eraser"></i>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" id="liveTypeToggle" checked class="rounded bg-gray-950 border-gray-800 text-purple-600 focus:ring-0">
+                        <span>Send keys instantly as you type</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Network Request Log / Status Console -->
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-lg flex-1 flex flex-col min-h-[220px]">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-purple-400"></i> Network Request Console
+                    </h2>
+                    <button id="clearLogsBtn" class="text-xs text-gray-500 hover:text-gray-300">Clear Console</button>
+                </div>
+                <div id="consoleLog" class="flex-1 bg-gray-950 border border-gray-800 rounded-xl p-3 font-mono text-xs text-gray-400 overflow-y-auto max-h-[180px] custom-scroll space-y-1">
+                    <div class="text-gray-600">// Ready. Press buttons on the remote or keyboard to issue commands...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Help Modal / Information Popup -->
+    <div id="infoModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl relative">
+            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-circle-info text-purple-500"></i> Setup & Network Guidance
+            </h3>
+            <div class="text-xs text-gray-300 space-y-3 leading-relaxed">
+                <p>
+                    <strong class="text-purple-400">1. Local Network Connection:</strong> Your device and Roku must be connected to the exact same Wi-Fi/LAN network.
+                </p>
+                <p>
+                    <strong class="text-purple-400">2. External Control Protocol (ECP):</strong> Roku devices feature a built-in REST API on port 8060. Control requests are dispatched directly via POST requests (e.g. <code class="bg-gray-950 px-1 py-0.5 rounded border border-gray-800 text-purple-300">http://&lt;roku-ip&gt;:8060/keypress/Home</code>).
+                </p>
+                <p>
+                    <strong class="text-purple-400">3. Browser CORS Policy Notice:</strong> Browsers restrict cross-origin HTTP requests. This application uses standard web <code class="bg-gray-950 px-1 py-0.5 rounded border border-gray-800 text-purple-300">mode: 'no-cors'</code> mode. The POST commands will successfully hit and execute on your Roku, even if browser status logs reflect an opaque response type.
+                </p>
+                <p>
+                    <strong class="text-purple-400">4. Keyboard Shortcuts:</strong>
+                </p>
+                <ul class="list-disc pl-5 space-y-1 text-gray-400">
+                    <li><code class="text-gray-200">Arrow Keys</code> : Navigation</li>
+                    <li><code class="text-gray-200">Enter</code> : OK / Select</li>
+                    <li><code class="text-gray-200">Backspace</code> : Back</li>
+                    <li><code class="text-gray-200">Escape</code> : Home</li>
+                    <li><code class="text-gray-200">Space</code> : Play / Pause</li>
+                </ul>
+            </div>
+            <button id="modalOkBtn" class="mt-5 w-full bg-purple-600 hover:bg-purple-500 text-white font-medium py-2 rounded-xl text-sm transition">
+                Got it
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-6 text-center text-xs text-gray-600">
+        Roku External Control Protocol Web Client • Fully Responsive & Standalone
+    </footer>
+
+    <!-- Application Script -->
+    <script>
+        // --- State Management ---
+        const DEFAULT_IP = '192.168.1.100';
+        let currentIp = localStorage.getItem('roku_ip') || DEFAULT_IP;
+        let soundEnabled = true;
+
+        // --- Web Audio API Tactile Sound Synthesis ---
+        let audioCtx = null;
+
+        function playClickSound() {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.04);
+
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.04);
+            } catch (e) {
+                // Audio Context fallback silent
+            }
+        }
+
+        // --- DOM Elements ---
+        const ipInput = document.getElementById('rokuIp');
+        const saveIpBtn = document.getElementById('saveIpBtn');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const consoleLog = document.getElementById('consoleLog');
+        const clearLogsBtn = document.getElementById('clearLogsBtn');
+        const textInput = document.getElementById('textInput');
+        const sendTextBtn = document.getElementById('sendTextBtn');
+        const clearTextBtn = document.getElementById('clearTextBtn');
+        const liveTypeToggle = document.getElementById('liveTypeToggle');
+        const infoModal = document.getElementById('infoModal');
+        const toggleInfoBtn = document.getElementById('toggleInfoBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalOkBtn = document.getElementById('modalOkBtn');
+
+        // Initialize IP
+        ipInput.value = currentIp;
+
+        // --- Console Logging ---
+        function log(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'flex items-start gap-2 border-b border-gray-900/50 pb-0.5';
+            
+            let colorClass = 'text-gray-400';
+            let icon = 'fa-arrow-right';
+            
+            if (type === 'success') {
+                colorClass = 'text-green-400';
+                icon = 'fa-check';
+            } else if (type === 'error') {
+                colorClass = 'text-red-400';
+                icon = 'fa-triangle-exclamation';
+            } else if (type === 'sent') {
+                colorClass = 'text-purple-400';
+                icon = 'fa-paper-plane';
+            }
+
+            entry.innerHTML = `
+                <span class="text-gray-600 text-[10px] select-none">${time}</span>
+                <i class="fa-solid ${icon} text-[10px] mt-1 ${colorClass}"></i>
+                <span class="${colorClass} flex-1 break-all">${message}</span>
+            `;
+
+            consoleLog.appendChild(entry);
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+
+        clearLogsBtn.addEventListener('click', () => {
+            consoleLog.innerHTML = '<div class="text-gray-600">// Console cleared.</div>';
+        });
+
+        // --- Roku API ECP Integration ---
+        
+        // 1. Send Keypress Command
+        async function sendKeypress(key) {
+            playClickSound();
+            const endpoint = `http://${currentIp}:8060/keypress/${key}`;
+            log(`POST ${endpoint}`, 'sent');
+
+            try {
+                // Use mode: 'no-cors' so browser does not block cross-origin requests to local IP
+                await fetch(endpoint, {
+                    method: 'POST',
+                    mode: 'no-cors'
+                });
+                log(`Executed keypress: ${key}`, 'success');
+            } catch (err) {
+                log(`Failed to send keypress ${key}: ${err.message}`, 'error');
+            }
+        }
+
+        // 2. Launch App
+        async function launchApp(appId) {
+            playClickSound();
+            const endpoint = `http://${currentIp}:8060/launch/${appId}`;
+            log(`POST ${endpoint}`, 'sent');
+
+            try {
+                await fetch(endpoint, {
+                    method: 'POST',
+                    mode: 'no-cors'
+                });
+                log(`Launched App ID: ${appId}`, 'success');
+            } catch (err) {
+                log(`Failed to launch app ${appId}: ${err.message}`, 'error');
+            }
+        }
+
+        // 3. Ping / Check Status
+        async function checkStatus() {
+            statusIndicator.className = 'w-3 h-3 rounded-full bg-yellow-500 animate-pulse';
+            statusText.textContent = 'Pinging...';
+            statusText.className = 'text-xs font-mono text-yellow-500';
+
+            const endpoint = `http://${currentIp}:8060/query/device-info`;
+            
+            try {
+                // ECP query status ping
+                await fetch(endpoint, {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+                
+                // With no-cors, fetch succeeds if network path is reachable
+                statusIndicator.className = 'w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]';
+                statusText.textContent = 'Connected (8060)';
+                statusText.className = 'text-xs font-mono text-green-400';
+                log(`Device pinged successfully at ${currentIp}:8060`, 'success');
+            } catch (err) {
+                statusIndicator.className = 'w-3 h-3 rounded-full bg-red-500';
+                statusText.textContent = 'Offline / Blocked';
+                statusText.className = 'text-xs font-mono text-red-400';
+                log(`Unable to reach device at ${currentIp}. Check IP & LAN network.`, 'error');
+            }
+        }
+
+        // Save IP Configuration
+        saveIpBtn.addEventListener('click', () => {
+            const rawIp = ipInput.value.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+            if (rawIp) {
+                currentIp = rawIp;
+                localStorage.setItem('roku_ip', currentIp);
+                log(`Updated target Roku IP: ${currentIp}`, 'info');
+                checkStatus();
+            }
+        });
+
+        // --- Setup Button Event Listeners ---
+        document.querySelectorAll('[data-key]').forEach(button => {
+            button.addEventListener('click', () => {
+                const key = button.getAttribute('data-key');
+                sendKeypress(key);
+            });
+        });
+
+        document.querySelectorAll('[data-app]').forEach(button => {
+            button.addEventListener('click', () => {
+                const appId = button.getAttribute('data-app');
+                launchApp(appId);
+            });
+        });
+
+        // --- Text Input Handling (Lit_ Keystrokes) ---
+        let lastTextValue = '';
+
+        textInput.addEventListener('input', (e) => {
+            if (!liveTypeToggle.checked) return;
+
+            const currentValue = e.target.value;
+            
+            if (currentValue.length > lastTextValue.length) {
+                // Character typed
+                const newChar = currentValue.slice(-1);
+                sendKeypress(`Lit_${encodeURIComponent(newChar)}`);
+            } else if (currentValue.length < lastTextValue.length) {
+                // Backspace pressed
+                sendKeypress('Backspace');
+            }
+            
+            lastTextValue = currentValue;
+        });
+
+        sendTextBtn.addEventListener('click', async () => {
+            const text = textInput.value;
+            if (!text) return;
+
+            log(`Sending text sequence: "${text}"`, 'info');
+            for (let char of text) {
+                await sendKeypress(`Lit_${encodeURIComponent(char)}`);
+            }
+        });
+
+        clearTextBtn.addEventListener('click', () => {
+            textInput.value = '';
+            lastTextValue = '';
+            sendKeypress('Backspace');
+        });
+
+        // --- Hardware Keyboard Navigation Mapping ---
+        document.addEventListener('keydown', (e) => {
+            // Do not intercept keyboard shortcuts if user is typing inside input boxes
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            let keyToTarget = null;
+            let targetElem = null;
+
+            switch (e.key) {
+                case 'ArrowUp':
+                    keyToTarget = 'Up';
+                    break;
+                case 'ArrowDown':
+                    keyToTarget = 'Down';
+                    break;
+                case 'ArrowLeft':
+                    keyToTarget = 'Left';
+                    break;
+                case 'ArrowRight':
+                    keyToTarget = 'Right';
+                    break;
+                case 'Enter':
+                    keyToTarget = 'Select';
+                    break;
+                case 'Backspace':
+                    keyToTarget = 'Back';
+                    break;
+                case 'Escape':
+                    keyToTarget = 'Home';
+                    break;
+                case ' ':
+                    keyToTarget = 'Play';
+                    e.preventDefault(); // prevent page scroll
+                    break;
+            }
+
+            if (keyToTarget) {
+                sendKeypress(keyToTarget);
+                
+                // Trigger button active press visual animation
+                targetElem = document.querySelector(`[data-key="${keyToTarget}"]`);
+                if (targetElem) {
+                    targetElem.classList.add('active-press');
+                    setTimeout(() => targetElem.classList.remove('active-press'), 120);
+                }
+            }
+        });
+
+        // --- Modal UI Handling ---
+        const toggleModal = (show) => {
+            if (show) infoModal.classList.remove('hidden');
+            else infoModal.classList.add('hidden');
+        };
+
+        toggleInfoBtn.addEventListener('click', () => toggleModal(true));
+        closeModalBtn.addEventListener('click', () => toggleModal(false));
+        modalOkBtn.addEventListener('click', () => toggleModal(false));
+
+        // Initial connection check on load
+        window.addEventListener('load', () => {
+            checkStatus();
+        });
+    </script>
+</body>
+</html>
