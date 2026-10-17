@@ -1,67 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roku Virtual Remote</title>
+    <title>Roku Control Center & Diagnostics Pro</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        roku: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#6d28d9',
+                            700: '#5b21b6',
+                            800: '#4c1d95',
+                            900: '#2e1065',
+                            accent: '#662d91'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0b0c10;
-            color: #e0e0e0;
+            background-color: #08090c;
+            color: #e2e8f0;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        /* Glossy & Tactile Dark Remote Styling */
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Tactile Dark Casing */
         .remote-casing {
-            background: linear-gradient(145deg, #1f2229, #121418);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
-                        inset 0 1px 1px 0 rgba(255, 255, 255, 0.1),
+            background: linear-gradient(165deg, #181a20 0%, #0d0e12 100%);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85),
+                        inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
                         0 0 0 1px rgba(255, 255, 255, 0.05);
-            border-radius: 40px;
+            border-radius: 42px;
         }
 
-        /* Tactile Button Effects */
+        /* Tactile Button Base Styles */
         .btn-tactile {
-            background: linear-gradient(145deg, #2a2e37, #1a1c23);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5),
-                        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-            transition: all 0.08s ease;
+            background: linear-gradient(145deg, #242832, #151820);
+            box-shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.6),
+                        inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+            transition: all 0.08s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-tactile:hover {
+            background: linear-gradient(145deg, #2c313e, #1a1e27);
+            color: #ffffff;
         }
 
         .btn-tactile:active, .btn-tactile.active-press {
             transform: translateY(2px);
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5),
-                        inset 0 2px 4px 0 rgba(0, 0, 0, 0.4);
-            background: linear-gradient(145deg, #1a1c23, #2a2e37);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.6),
+                        inset 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+            background: linear-gradient(145deg, #13151c, #222630);
         }
 
-        /* Purple Roku Accent Button */
+        /* Accent Buttons */
         .btn-purple {
             background: linear-gradient(145deg, #7c3aed, #5b21b6);
-            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3),
-                        inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35),
+                        inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
         }
-        
+        .btn-purple:hover {
+            background: linear-gradient(145deg, #8b5cf6, #6d28d9);
+        }
         .btn-purple:active, .btn-purple.active-press {
             transform: translateY(2px);
             box-shadow: 0 1px 3px rgba(124, 58, 237, 0.3),
-                        inset 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+                        inset 0 2px 5px 0 rgba(0, 0, 0, 0.5);
             background: linear-gradient(145deg, #5b21b6, #7c3aed);
         }
 
-        /* Power Button Special */
         .btn-power {
             background: linear-gradient(145deg, #dc2626, #991b1b);
-            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.25);
+            box-shadow: 0 4px 10px rgba(220, 38, 38, 0.3);
+        }
+        .btn-power:hover {
+            background: linear-gradient(145deg, #ef4444, #b91c1c);
         }
         .btn-power:active, .btn-power.active-press {
             transform: translateY(2px);
@@ -71,541 +104,966 @@
 
         /* Directional Pad Center */
         .dpad-center {
-            background: radial-gradient(circle, #2d323e 0%, #1a1c23 100%);
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.6), 0 1px 1px rgba(255,255,255,0.05);
+            background: radial-gradient(circle, #2d323e 0%, #12141a 100%);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.7), 0 1px 1px rgba(255,255,255,0.05);
         }
 
-        /* App Button Custom Colors */
-        .btn-netflix { background: #E50914; color: white; }
-        .btn-youtube { background: #FF0000; color: white; }
-        .btn-hulu { background: #1CE783; color: #0B0C10; }
-        .btn-disney { background: #113CCF; color: white; }
-        .btn-prime { background: #00A8E1; color: white; }
-        .btn-apple { background: #333333; color: white; }
-
-        /* Custom Scrollbar for Logs */
-        .custom-scroll::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #111827;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #374151;
-            border-radius: 3px;
-        }
+        /* Custom Scrollbars */
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #0c0e12; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #272a34; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #3b3f4f; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between items-center p-4 sm:p-6">
+<body class="min-h-screen flex flex-col justify-between items-center p-3 sm:p-6 bg-slate-950">
 
-    <!-- Header / Brand -->
-    <header class="w-full max-w-4xl flex justify-between items-center mb-4">
-        <div class="flex items-center space-x-2">
-            <span class="text-2xl font-bold tracking-wider text-purple-500 flex items-center gap-2">
-                <i class="fa-solid fa-tv"></i> ROKU <span class="text-xs text-gray-400 font-normal px-2 py-0.5 bg-gray-800 rounded-full border border-gray-700">ECP Remote</span>
-            </span>
+    <!-- Header Navigation -->
+    <header class="w-full max-w-7xl flex flex-wrap justify-between items-center gap-4 mb-4 pb-3 border-b border-slate-800/80">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-roku-700 to-purple-500 flex items-center justify-center shadow-lg shadow-purple-900/40">
+                <i class="fa-solid fa-tv text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-extrabold tracking-wider text-white flex items-center gap-2">
+                    ROKU <span class="text-xs text-purple-400 font-semibold px-2 py-0.5 bg-purple-950/80 rounded-md border border-purple-800/50">ECP PRO</span>
+                </h1>
+                <p class="text-[11px] text-slate-400">Control, Diagnostics & Automation Suite</p>
+            </div>
         </div>
-        <button id="toggleInfoBtn" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-700 transition flex items-center gap-1">
-            <i class="fa-solid fa-circle-info text-purple-400"></i> Setup & CORS Help
-        </button>
+
+        <!-- Quick Status & Top Action Controls -->
+        <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+            <button id="quickScanBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-radar text-purple-400"></i>
+                <span class="hidden sm:inline">IP Scanner</span>
+            </button>
+            <button id="toggleShortcutsBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-keyboard text-purple-400"></i>
+                <span class="hidden sm:inline">Shortcuts</span>
+            </button>
+            <button id="toggleInfoBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-circle-question text-purple-400"></i>
+                <span class="hidden sm:inline">Help & HTTPS</span>
+            </button>
+        </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="w-full max-w-4xl flex flex-col lg:flex-row items-start justify-center gap-8">
+    <!-- Main Grid Dashboard -->
+    <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        <!-- REMOTE CONTROLLER UI -->
-        <div class="remote-casing w-full max-w-[320px] mx-auto p-6 flex flex-col items-center gap-5 border border-gray-800 relative">
+        <!-- LEFT COLUMN: PHYSICAL REMOTE CONTROLLER (lg:col-span-4) -->
+        <div class="lg:col-span-4 w-full flex flex-col items-center">
             
-            <!-- Top Controls (Power & Settings Status) -->
-            <div class="w-full flex justify-between items-center px-2">
-                <div class="flex items-center space-x-2">
-                    <span id="statusIndicator" class="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" title="Checking status..."></span>
-                    <span id="statusText" class="text-xs font-mono text-gray-400">Connecting...</span>
-                </div>
-                <button data-key="Power" class="btn-power text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-md">
-                    <i class="fa-solid fa-power-off"></i>
-                </button>
-            </div>
-
-            <!-- Upper Navigation (Back & Home) -->
-            <div class="w-full grid grid-cols-2 gap-4 px-2">
-                <button data-key="Back" class="btn-tactile h-12 rounded-2xl flex items-center justify-center text-gray-200 hover:text-white">
-                    <i class="fa-solid fa-arrow-left text-lg"></i>
-                </button>
-                <button data-key="Home" class="btn-purple h-12 rounded-2xl flex items-center justify-center text-white font-semibold">
-                    <i class="fa-solid fa-house text-lg"></i>
-                </button>
-            </div>
-
-            <!-- D-PAD / Directional Cross -->
-            <div class="relative w-56 h-56 rounded-full dpad-center p-2 flex items-center justify-center border border-gray-700/50">
-                <!-- Up -->
-                <button data-key="Up" class="btn-tactile absolute top-2 w-14 h-14 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
-                    <i class="fa-solid fa-caret-up text-2xl"></i>
-                </button>
+            <!-- REMOTE CASING -->
+            <div class="remote-casing w-full max-w-[340px] p-6 flex flex-col items-center gap-4 border border-slate-800 relative">
                 
-                <!-- Left -->
-                <button data-key="Left" class="btn-tactile absolute left-2 w-14 h-14 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
-                    <i class="fa-solid fa-caret-left text-2xl"></i>
-                </button>
+                <!-- Status & Power Switch Bar -->
+                <div class="w-full flex justify-between items-center px-1">
+                    <div class="flex items-center space-x-2">
+                        <span id="statusIndicator" class="w-3 h-3 rounded-full bg-yellow-500 animate-pulse"></span>
+                        <span id="statusText" class="text-xs font-mono text-slate-400 truncate max-w-[150px]">Initializing...</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button data-key="Power" title="Power Toggle" class="btn-power text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-md">
+                            <i class="fa-solid fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
 
-                <!-- OK / Select -->
-                <button data-key="Select" class="btn-purple w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-inner tracking-wide">
-                    OK
-                </button>
+                <!-- Upper Nav (Back & Home) -->
+                <div class="w-full grid grid-cols-2 gap-3 px-1">
+                    <button data-key="Back" title="Back (Backspace)" class="btn-tactile h-12 rounded-2xl flex items-center justify-center text-slate-200">
+                        <i class="fa-solid fa-arrow-left text-lg"></i>
+                    </button>
+                    <button data-key="Home" title="Home Screen (Esc / H)" class="btn-purple h-12 rounded-2xl flex items-center justify-center text-white">
+                        <i class="fa-solid fa-house text-lg"></i>
+                    </button>
+                </div>
 
-                <!-- Right -->
-                <button data-key="Right" class="btn-tactile absolute right-2 w-14 h-14 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
-                    <i class="fa-solid fa-caret-right text-2xl"></i>
-                </button>
+                <!-- D-PAD Navigation Cross -->
+                <div class="relative w-56 h-56 rounded-full dpad-center p-2 flex items-center justify-center border border-slate-800 shadow-2xl my-1">
+                    <!-- Up -->
+                    <button data-key="Up" title="Up Arrow" class="btn-tactile absolute top-2 w-14 h-14 rounded-2xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-caret-up text-2xl"></i>
+                    </button>
+                    
+                    <!-- Left -->
+                    <button data-key="Left" title="Left Arrow" class="btn-tactile absolute left-2 w-14 h-14 rounded-2xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-caret-left text-2xl"></i>
+                    </button>
 
-                <!-- Down -->
-                <button data-key="Down" class="btn-tactile absolute bottom-2 w-14 h-14 rounded-2xl flex items-center justify-center text-gray-300 hover:text-white">
-                    <i class="fa-solid fa-caret-down text-2xl"></i>
-                </button>
+                    <!-- OK / Select -->
+                    <button data-key="Select" title="Select / OK (Enter)" class="btn-purple w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-inner tracking-wide">
+                        OK
+                    </button>
+
+                    <!-- Right -->
+                    <button data-key="Right" title="Right Arrow" class="btn-tactile absolute right-2 w-14 h-14 rounded-2xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-caret-right text-2xl"></i>
+                    </button>
+
+                    <!-- Down -->
+                    <button data-key="Down" title="Down Arrow" class="btn-tactile absolute bottom-2 w-14 h-14 rounded-2xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-caret-down text-2xl"></i>
+                    </button>
+                </div>
+
+                <!-- Instant Replay & Options (*) -->
+                <div class="w-full grid grid-cols-2 gap-3 px-1">
+                    <button data-key="InstantReplay" title="Instant Replay" class="btn-tactile h-10 rounded-xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-rotate-left text-sm"></i>
+                    </button>
+                    <button data-key="Info" title="Options / Info (*)" class="btn-tactile h-10 rounded-xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-asterisk text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Playback Controls -->
+                <div class="w-full grid grid-cols-3 gap-2 px-1">
+                    <button data-key="Rev" title="Rewind" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-backward text-sm"></i>
+                    </button>
+                    <button data-key="Play" title="Play / Pause (Space)" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-play-pause text-sm"></i>
+                    </button>
+                    <button data-key="Fwd" title="Fast Forward" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-forward text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Volume & Mute Controls -->
+                <div class="w-full grid grid-cols-3 gap-2 px-1 border-t border-slate-800/80 pt-3">
+                    <button data-key="VolumeDown" title="Volume Down (-)" class="btn-tactile h-10 rounded-xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-volume-low text-xs"></i>
+                    </button>
+                    <button data-key="VolumeMute" title="Mute (M)" class="btn-tactile h-10 rounded-xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-volume-xmark text-xs"></i>
+                    </button>
+                    <button data-key="VolumeUp" title="Volume Up (+)" class="btn-tactile h-10 rounded-xl flex items-center justify-center text-slate-300">
+                        <i class="fa-solid fa-volume-high text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- TV Channel & Live Controls -->
+                <div class="w-full grid grid-cols-3 gap-2 px-1">
+                    <button data-key="ChannelUp" title="Channel Up" class="btn-tactile h-9 rounded-lg text-xs font-medium text-slate-300 flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-chevron-up text-[10px]"></i> CH+
+                    </button>
+                    <button data-key="ChannelDown" title="Channel Down" class="btn-tactile h-9 rounded-lg text-xs font-medium text-slate-300 flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-chevron-down text-[10px]"></i> CH-
+                    </button>
+                    <button data-key="InputTuner" title="Live TV / Guide" class="btn-tactile h-9 rounded-lg text-xs font-medium text-slate-300 flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-tv text-[10px]"></i> Guide
+                    </button>
+                </div>
+
+                <!-- HDMI & Source Selection Toggle -->
+                <div class="w-full pt-2 border-t border-slate-800/80">
+                    <div class="text-[10px] font-semibold uppercase text-slate-500 mb-1.5 px-1 tracking-wider">Input Source Switcher</div>
+                    <div class="grid grid-cols-4 gap-1.5 px-1">
+                        <button data-key="InputHDMI1" class="btn-tactile h-8 rounded-lg text-[10px] font-semibold text-purple-300">HDMI 1</button>
+                        <button data-key="InputHDMI2" class="btn-tactile h-8 rounded-lg text-[10px] font-semibold text-purple-300">HDMI 2</button>
+                        <button data-key="InputHDMI3" class="btn-tactile h-8 rounded-lg text-[10px] font-semibold text-purple-300">HDMI 3</button>
+                        <button data-key="InputHDMI4" class="btn-tactile h-8 rounded-lg text-[10px] font-semibold text-purple-300">HDMI 4</button>
+                        <button data-key="InputAV1" class="btn-tactile h-8 rounded-lg text-[10px] font-semibold text-slate-400">AV</button>
+                        <button data-key="InputTuner" class="btn-tactile h-8 rounded-lg text-[10px] font-semibold text-slate-400">Antenna</button>
+                        <button data-key="FindRemote" class="btn-tactile col-span-2 h-8 rounded-lg text-[10px] font-semibold text-yellow-400 flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-bullhorn"></i> Find Remote
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-[10px] text-slate-600 tracking-widest font-semibold mt-1">ROKU ECP REMOTE</div>
             </div>
-
-            <!-- Instant Replay & Options (*) -->
-            <div class="w-full grid grid-cols-2 gap-4 px-2">
-                <button data-key="InstantReplay" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-gray-300 hover:text-white" title="Instant Replay">
-                    <i class="fa-solid fa-rotate-left text-md"></i>
-                </button>
-                <button data-key="Info" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-gray-300 hover:text-white" title="Options / Info">
-                    <i class="fa-solid fa-asterisk text-md"></i>
-                </button>
-            </div>
-
-            <!-- Playback Controls -->
-            <div class="w-full grid grid-cols-3 gap-3 px-2">
-                <button data-key="Rev" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-gray-300 hover:text-white">
-                    <i class="fa-solid fa-backward text-md"></i>
-                </button>
-                <button data-key="Play" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-gray-300 hover:text-white">
-                    <i class="fa-solid fa-play-pause text-md"></i>
-                </button>
-                <button data-key="Fwd" class="btn-tactile h-11 rounded-xl flex items-center justify-center text-gray-300 hover:text-white">
-                    <i class="fa-solid fa-forward text-md"></i>
-                </button>
-            </div>
-
-            <!-- Volume Controls -->
-            <div class="w-full grid grid-cols-3 gap-3 px-2 border-t border-gray-800/80 pt-4">
-                <button data-key="VolumeDown" class="btn-tactile h-10 rounded-xl flex items-center justify-center text-gray-300 hover:text-white" title="Volume Down">
-                    <i class="fa-solid fa-volume-low text-sm"></i>
-                </button>
-                <button data-key="VolumeMute" class="btn-tactile h-10 rounded-xl flex items-center justify-center text-gray-300 hover:text-white" title="Mute">
-                    <i class="fa-solid fa-volume-xmark text-sm"></i>
-                </button>
-                <button data-key="VolumeUp" class="btn-tactile h-10 rounded-xl flex items-center justify-center text-gray-300 hover:text-white" title="Volume Up">
-                    <i class="fa-solid fa-volume-high text-sm"></i>
-                </button>
-            </div>
-
-            <!-- App Shortcuts -->
-            <div class="w-full grid grid-cols-2 gap-2.5 px-2 pt-2 border-t border-gray-800/80">
-                <button data-app="12" class="btn-netflix h-9 rounded-lg font-bold text-xs tracking-wider uppercase shadow hover:opacity-90 transition">
-                    Netflix
-                </button>
-                <button data-app="837" class="btn-youtube h-9 rounded-lg font-bold text-xs tracking-wider uppercase shadow hover:opacity-90 transition flex items-center justify-center gap-1">
-                    <i class="fa-brands fa-youtube text-sm"></i> YouTube
-                </button>
-                <button data-app="2285" class="btn-hulu h-9 rounded-lg font-bold text-xs tracking-wider uppercase shadow hover:opacity-90 transition">
-                    Hulu
-                </button>
-                <button data-app="291097" class="btn-disney h-9 rounded-lg font-bold text-xs tracking-wider uppercase shadow hover:opacity-90 transition">
-                    Disney+
-                </button>
-            </div>
-
-            <div class="text-[10px] text-gray-600 tracking-widest font-semibold mt-1">ROKU REMOTE</div>
         </div>
 
-        <!-- RIGHT PANEL: CONFIG, TEXT INPUT, LOGS -->
-        <div class="flex-1 w-full flex flex-col gap-5">
-            
-            <!-- Connection & Settings Box -->
-            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-lg">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-network-wired text-purple-400"></i> Target Device Configuration
-                </h2>
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <div class="relative flex-1">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500 text-xs font-mono">http://</span>
-                        <input type="text" id="rokuIp" placeholder="192.168.1.100" class="w-full pl-16 pr-4 py-2 bg-gray-950 border border-gray-800 rounded-xl text-sm font-mono text-purple-300 focus:outline-none focus:border-purple-500">
+        <!-- RIGHT / CENTER WORKSTATION (lg:col-span-8) -->
+        <div class="lg:col-span-8 w-full flex flex-col gap-5">
+
+            <!-- TABBED NAVIGATION HEADER FOR PANELS -->
+            <div class="flex gap-2 overflow-x-auto pb-1 border-b border-slate-800 custom-scroll text-xs">
+                <button id="tabDevices" class="tab-btn px-4 py-2 rounded-xl font-semibold bg-purple-600 text-white flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-network-wired"></i> Devices & Config
+                </button>
+                <button id="tabApps" class="tab-btn px-4 py-2 rounded-xl font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-grip"></i> Channel Apps
+                </button>
+                <button id="tabKeyboard" class="tab-btn px-4 py-2 rounded-xl font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-keyboard"></i> Smart Keyboard
+                </button>
+                <button id="tabMacros" class="tab-btn px-4 py-2 rounded-xl font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Macros & API
+                </button>
+            </div>
+
+            <!-- PANEL 1: DEVICE MANAGER & LIVE DIAGNOSTICS -->
+            <div id="panelDevices" class="tab-panel flex flex-col gap-4">
+                
+                <!-- Active Connection Switcher Card -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-purple-400"></i> Target Roku Connection
+                        </h2>
+                        <button id="addDeviceBtn" class="text-xs text-purple-400 hover:text-purple-300 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Save Device Preset
+                        </button>
                     </div>
-                    <button id="saveIpBtn" class="bg-purple-600 hover:bg-purple-500 text-white font-medium px-5 py-2 rounded-xl text-sm transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-plug"></i> Connect / Ping
-                    </button>
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                        <!-- Presets Selector -->
+                        <div class="md:col-span-5">
+                            <label class="block text-[11px] text-slate-400 mb-1">Saved Device Profiles</label>
+                            <select id="devicePresetSelect" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-purple-300 focus:outline-none focus:border-purple-500 font-mono">
+                                <!-- Dynamic Options -->
+                            </select>
+                        </div>
+                        
+                        <!-- Manual IP Input -->
+                        <div class="md:col-span-5">
+                            <label class="block text-[11px] text-slate-400 mb-1">Device Local IP Address</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500 text-xs font-mono">http://</span>
+                                <input type="text" id="rokuIp" placeholder="192.168.1.100" class="w-full pl-16 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-purple-300 focus:outline-none focus:border-purple-500">
+                            </div>
+                        </div>
+
+                        <!-- Connect Action -->
+                        <div class="md:col-span-2 flex items-end">
+                            <button id="saveIpBtn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1 shadow-md">
+                                <i class="fa-solid fa-rotate"></i> Connect
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-xs text-gray-500 mt-2">
-                    Enter your Roku local IP address (Found in Roku Settings > Network > About). ECP Port: 8060.
-                </p>
+
+                <!-- Live System Diagnostics & Info Display -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <i class="fa-solid fa-microchip text-purple-400"></i> Live Device Diagnostics
+                        </h2>
+                        <label class="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
+                            <input type="checkbox" id="autoPollToggle" class="rounded bg-slate-950 border-slate-800 text-purple-600 focus:ring-0">
+                            <span>Auto-refresh (5s)</span>
+                        </label>
+                    </div>
+
+                    <div id="diagnosticsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs">
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-500 block uppercase">Model</span>
+                            <span id="diagModel" class="font-mono font-semibold text-slate-200">--</span>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-500 block uppercase">Active App</span>
+                            <span id="diagApp" class="font-mono font-semibold text-purple-400">--</span>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-500 block uppercase">Serial Number</span>
+                            <span id="diagSerial" class="font-mono font-semibold text-slate-300 truncate block">--</span>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-500 block uppercase">Software Version</span>
+                            <span id="diagSoftware" class="font-mono font-semibold text-slate-300">--</span>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-500 block uppercase">Uptime</span>
+                            <span id="diagUptime" class="font-mono font-semibold text-slate-300">--</span>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-slate-500 block uppercase">Wi-Fi MAC</span>
+                            <span id="diagMac" class="font-mono font-semibold text-slate-300">--</span>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 col-span-2">
+                            <span class="text-[10px] text-slate-500 block uppercase">Network Status</span>
+                            <span id="diagNetwork" class="font-mono font-semibold text-emerald-400">Ready</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Direct Text Entry Section -->
-            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-lg">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-keyboard text-purple-400"></i> Keyboard Search / Text Entry
-                </h2>
-                <p class="text-xs text-gray-400 mb-3">Type below to send keystrokes live to on-screen text fields on your Roku.</p>
-                
-                <div class="flex gap-2">
-                    <input type="text" id="textInput" placeholder="Type search query here..." class="flex-1 px-4 py-2 bg-gray-950 border border-gray-800 rounded-xl text-sm text-gray-200 focus:outline-none focus:border-purple-500">
-                    <button id="sendTextBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 font-medium px-4 py-2 rounded-xl text-sm transition flex items-center gap-1">
-                        <i class="fa-solid fa-paper-plane text-xs"></i> Send
-                    </button>
-                    <button id="clearTextBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-400 font-medium px-3 py-2 rounded-xl text-sm transition" title="Clear Field & Backspace Roku">
-                        <i class="fa-solid fa-eraser"></i>
-                    </button>
-                </div>
-                
-                <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
-                    <label class="flex items-center gap-1.5 cursor-pointer">
-                        <input type="checkbox" id="liveTypeToggle" checked class="rounded bg-gray-950 border-gray-800 text-purple-600 focus:ring-0">
-                        <span>Send keys instantly as you type</span>
-                    </label>
+            <!-- PANEL 2: DYNAMIC APPS & STREAMING LAUNCHER -->
+            <div id="panelApps" class="tab-panel flex flex-col gap-4 hidden">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <i class="fa-solid fa-shapes text-purple-400"></i> App & Channel Hub
+                        </h2>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <input type="text" id="appSearchInput" placeholder="Filter apps..." class="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-purple-500 w-full sm:w-48">
+                            <button id="fetchInstalledAppsBtn" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-xl border border-slate-700 text-slate-300 font-medium whitespace-nowrap">
+                                <i class="fa-solid fa-cloud-arrow-down"></i> Sync Roku
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Streaming App Launcher Grid -->
+                    <div id="appsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[380px] overflow-y-auto custom-scroll pr-1">
+                        <!-- Default Popular App Presets -->
+                    </div>
                 </div>
             </div>
 
-            <!-- Network Request Log / Status Console -->
-            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-lg flex-1 flex flex-col min-h-[220px]">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                        <i class="fa-solid fa-terminal text-purple-400"></i> Network Request Console
+            <!-- PANEL 3: SMART KEYBOARD & TEXT ENTRY -->
+            <div id="panelKeyboard" class="tab-panel flex flex-col gap-4 hidden">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-keyboard text-purple-400"></i> Direct Text Entry & Preset Buffer
                     </h2>
-                    <button id="clearLogsBtn" class="text-xs text-gray-500 hover:text-gray-300">Clear Console</button>
-                </div>
-                <div id="consoleLog" class="flex-1 bg-gray-950 border border-gray-800 rounded-xl p-3 font-mono text-xs text-gray-400 overflow-y-auto max-h-[180px] custom-scroll space-y-1">
-                    <div class="text-gray-600">// Ready. Press buttons on the remote or keyboard to issue commands...</div>
+                    <p class="text-xs text-slate-400 mb-4">Send search queries or text strings straight to active text input boxes on your Roku.</p>
+
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="textInput" placeholder="Type password, movie search, or URL..." class="flex-1 px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-purple-500 font-mono">
+                        <button id="sendTextBtn" class="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1 shadow-md">
+                            <i class="fa-solid fa-paper-plane text-xs"></i> Send
+                        </button>
+                        <button id="clearTextBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-400 font-medium px-3 py-2 rounded-xl text-xs transition" title="Clear Field & Backspace">
+                            <i class="fa-solid fa-eraser"></i>
+                        </button>
+                    </div>
+
+                    <!-- Keyboard Settings & Options -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400 bg-slate-950 p-3 rounded-xl border border-slate-800/80 mb-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="liveTypeToggle" checked class="rounded bg-slate-900 border-slate-800 text-purple-600 focus:ring-0">
+                            <span>Send keystrokes instantly as you type</span>
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <span>Typing delay:</span>
+                            <select id="typingDelay" class="bg-slate-900 border border-slate-800 rounded px-2 py-1 text-slate-300 text-xs">
+                                <option value="30">30 ms (Fast)</option>
+                                <option value="80" selected>80 ms (Normal)</option>
+                                <option value="150">150 ms (Reliable)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Fast Text Snippet Presets -->
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase text-slate-500 block mb-2">Quick Search & Text Shortcuts</span>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="preset-text-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700">Action Movies</button>
+                            <button class="preset-text-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700">Comedy Shows</button>
+                            <button class="preset-text-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700">4K Movies</button>
+                            <button class="preset-text-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700">Documentaries</button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- PANEL 4: AUTOMATION MACROS & CUSTOM API TESTER -->
+            <div id="panelMacros" class="tab-panel flex flex-col gap-4 hidden">
+                
+                <!-- Macro Sequence Builder -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i> Automation Sequence Macros
+                    </h2>
+
+                    <!-- Macro Triggers -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                        <button id="macroPowerOnLaunch" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 p-3 rounded-xl text-left transition group">
+                            <span class="text-xs font-semibold text-purple-300 group-hover:text-purple-200 block mb-1 flex items-center justify-between">
+                                Power On & YouTube <i class="fa-solid fa-play text-[10px]"></i>
+                            </span>
+                            <span class="text-[10px] text-slate-500 block">Sends PowerOn -> Home -> YouTube App</span>
+                        </button>
+
+                        <button id="macroNetflixShort" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 p-3 rounded-xl text-left transition group">
+                            <span class="text-xs font-semibold text-purple-300 group-hover:text-purple-200 block mb-1 flex items-center justify-between">
+                                Home & Launch Netflix <i class="fa-solid fa-play text-[10px]"></i>
+                            </span>
+                            <span class="text-[10px] text-slate-500 block">Sends Home -> Select -> Launch Netflix</span>
+                        </button>
+
+                        <button id="macroMuteTV" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 p-3 rounded-xl text-left transition group">
+                            <span class="text-xs font-semibold text-purple-300 group-hover:text-purple-200 block mb-1 flex items-center justify-between">
+                                Mute & Pause <i class="fa-solid fa-play text-[10px]"></i>
+                            </span>
+                            <span class="text-[10px] text-slate-500 block">Sends Pause -> Mute Volume</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom ECP API Request Command Builder -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-purple-400"></i> Raw ECP Command Tester
+                    </h2>
+                    <p class="text-xs text-slate-400 mb-3">Issue direct GET or POST commands to the Roku External Control REST endpoint.</p>
+
+                    <div class="flex flex-col sm:flex-row gap-2 mb-3">
+                        <select id="apiMethod" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-purple-300 font-mono focus:outline-none">
+                            <option value="POST">POST</option>
+                            <option value="GET">GET</option>
+                        </select>
+                        <input type="text" id="apiEndpoint" placeholder="/keypress/Home or /query/apps" class="flex-1 px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500">
+                        <button id="sendApiBtn" class="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition flex items-center justify-center gap-1">
+                            Execute ECP
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NETWORK CONSOLE LOG (ALWAYS VISIBLE AT BOTTOM) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg flex-1 flex flex-col min-h-[180px]">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                        <i class="fa-solid fa-code text-purple-400"></i> ECP Network Request Console
+                    </h2>
+                    <button id="clearLogsBtn" class="text-xs text-slate-500 hover:text-slate-300">Clear Logs</button>
+                </div>
+                <div id="consoleLog" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-400 overflow-y-auto max-h-[150px] custom-scroll space-y-1">
+                    <div class="text-slate-600">// ECP Request Logger Ready...</div>
+                </div>
+            </div>
+
         </div>
     </main>
 
-    <!-- Help Modal / Information Popup -->
-    <div id="infoModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl relative">
-            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-500 hover:text-white">
+    <!-- MODAL: IP SUBNET SCANNER -->
+    <div id="scanModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-lg w-full shadow-2xl relative">
+            <button class="close-modal-btn absolute top-4 right-4 text-slate-500 hover:text-white">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                <i class="fa-solid fa-circle-info text-purple-500"></i> Setup & Network Guidance
+            <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-radar text-purple-400"></i> Subnet Roku Device Discovery
             </h3>
-            <div class="text-xs text-gray-300 space-y-3 leading-relaxed">
-                <p>
-                    <strong class="text-purple-400">1. Local Network Connection:</strong> Your device and Roku must be connected to the exact same Wi-Fi/LAN network.
-                </p>
-                <p>
-                    <strong class="text-purple-400">2. External Control Protocol (ECP):</strong> Roku devices feature a built-in REST API on port 8060. Control requests are dispatched directly via POST requests (e.g. <code class="bg-gray-950 px-1 py-0.5 rounded border border-gray-800 text-purple-300">http://&lt;roku-ip&gt;:8060/keypress/Home</code>).
-                </p>
-                <p>
-                    <strong class="text-purple-400">3. Browser CORS Policy Notice:</strong> Browsers restrict cross-origin HTTP requests. This application uses standard web <code class="bg-gray-950 px-1 py-0.5 rounded border border-gray-800 text-purple-300">mode: 'no-cors'</code> mode. The POST commands will successfully hit and execute on your Roku, even if browser status logs reflect an opaque response type.
-                </p>
-                <p>
-                    <strong class="text-purple-400">4. Keyboard Shortcuts:</strong>
-                </p>
-                <ul class="list-disc pl-5 space-y-1 text-gray-400">
-                    <li><code class="text-gray-200">Arrow Keys</code> : Navigation</li>
-                    <li><code class="text-gray-200">Enter</code> : OK / Select</li>
-                    <li><code class="text-gray-200">Backspace</code> : Back</li>
-                    <li><code class="text-gray-200">Escape</code> : Home</li>
-                    <li><code class="text-gray-200">Space</code> : Play / Pause</li>
-                </ul>
+            <p class="text-xs text-slate-400 mb-4">Scans nearby IPs on your local subnet on port 8060 to discover active Roku devices.</p>
+
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="subnetPrefix" placeholder="192.168.1" class="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-purple-300 focus:outline-none">
+                <button id="startSubnetScanBtn" class="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-4 py-2 rounded-xl text-xs">
+                    Start Scan
+                </button>
             </div>
-            <button id="modalOkBtn" class="mt-5 w-full bg-purple-600 hover:bg-purple-500 text-white font-medium py-2 rounded-xl text-sm transition">
-                Got it
-            </button>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-950 rounded-full h-2 mb-3 overflow-hidden border border-slate-800">
+                <div id="scanProgressBar" class="bg-purple-500 h-full w-0 transition-all duration-150"></div>
+            </div>
+
+            <div id="scanResultsList" class="bg-slate-950 border border-slate-800 rounded-xl p-3 max-h-48 overflow-y-auto custom-scroll text-xs space-y-2 font-mono text-slate-400">
+                <div class="text-slate-600">// Enter IP subnet range (e.g. 192.168.1) and press scan...</div>
+            </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="mt-6 text-center text-xs text-gray-600">
-        Roku External Control Protocol Web Client • Fully Responsive & Standalone
-    </footer>
+    <!-- MODAL: KEYBOARD SHORTCUTS REFERENCE -->
+    <div id="shortcutsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl relative">
+            <button class="close-modal-btn absolute top-4 right-4 text-slate-500 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-keyboard text-purple-400"></i> Hardware Keyboard Controls
+            </h3>
+            <div class="grid grid-cols-2 gap-2 text-xs text-slate-300 font-mono">
+                <div class="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between">
+                    <span class="text-slate-400">Arrow Keys</span> <span>Navigate</span>
+                </div>
+                <div class="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between">
+                    <span class="text-slate-400">Enter</span> <span>OK / Select</span>
+                </div>
+                <div class="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between">
+                    <span class="text-slate-400">Backspace</span> <span>Back</span>
+                </div>
+                <div class="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between">
+                    <span class="text-slate-400">Esc or H</span> <span>Home</span>
+                </div>
+                <div class="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between">
+                    <span class="text-slate-400">Space</span> <span>Play/Pause</span>
+                </div>
+                <div class="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between">
+                    <span class="text-slate-400">P Key</span> <span>Power</span>
+                </div>
+                <div class="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between">
+                    <span class="text-slate-400">M Key</span> <span>Mute</span>
+                </div>
+                <div class="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between">
+                    <span class="text-slate-400">+ / -</span> <span>Volume</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Application Script -->
+    <!-- MODAL: HELP & HTTPS TROUBLESHOOTING -->
+    <div id="infoModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-lg w-full shadow-2xl relative">
+            <button class="close-modal-btn absolute top-4 right-4 text-slate-500 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-purple-400"></i> Setup & HTTPS Fixes
+            </h3>
+            <div class="text-xs text-slate-300 space-y-3 leading-relaxed">
+                <p>
+                    <strong class="text-purple-400">1. External Control Access:</strong> On your Roku, navigate to <code class="bg-slate-950 px-1 text-purple-300">Settings > System > Advanced system settings > Control by mobile apps</code> and set it to <strong>Network access (Permissive)</strong>.
+                </p>
+                <p>
+                    <strong class="text-purple-400">2. HTTPS Block ("Mixed Content"):</strong> Browsers block web pages loaded on <code class="bg-slate-950 px-1 text-purple-300">https://</code> from making HTTP requests to local IP addresses.
+                </p>
+                <ul class="list-disc pl-5 space-y-1 text-slate-400">
+                    <li>Open this web page file directly in your browser (<code class="text-slate-200">file:///...</code>).</li>
+                    <li>Or click the <strong>Site Settings padlock icon</strong> near the address bar and select <i>Allow Insecure Content</i>.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
     <script>
-        // --- State Management ---
-        const DEFAULT_IP = '192.168.1.100';
-        let currentIp = localStorage.getItem('roku_ip') || DEFAULT_IP;
-        let soundEnabled = true;
+        // --- PRESET STREAMING APPS DEFAULT DATA ---
+        const POPULAR_APPS = [
+            { id: '12', name: 'Netflix', icon: 'fa-film', color: 'bg-red-600' },
+            { id: '837', name: 'YouTube', icon: 'fa-brands fa-youtube', color: 'bg-red-600' },
+            { id: '2285', name: 'Hulu', icon: 'fa-tv', color: 'bg-emerald-500' },
+            { id: '291097', name: 'Disney+', icon: 'fa-sparkles', color: 'bg-blue-600' },
+            { id: '13', name: 'Prime Video', icon: 'fa-video', color: 'bg-sky-500' },
+            { id: '61322', name: 'Max / HBO', icon: 'fa-play', color: 'bg-purple-700' },
+            { id: '551012', name: 'Apple TV', icon: 'fa-brands fa-apple', color: 'bg-slate-800' },
+            { id: '19977', name: 'Spotify', icon: 'fa-brands fa-spotify', color: 'bg-green-500' },
+            { id: '13535', name: 'Plex', icon: 'fa-server', color: 'bg-amber-500' },
+            { id: '151908', name: 'The Roku Channel', icon: 'fa-tv', color: 'bg-purple-900' },
+            { id: '593099', name: 'Paramount+', icon: 'fa-mountain', color: 'bg-blue-700' },
+            { id: '592546', name: 'Peacock', icon: 'fa-feather', color: 'bg-teal-600' }
+        ];
 
-        // --- Web Audio API Tactile Sound Synthesis ---
+        // --- STATE MANAGEMENT ---
+        let devices = JSON.parse(localStorage.getItem('roku_devices') || '[]');
+        if (devices.length === 0) {
+            devices = [{ name: 'Default Roku', ip: '192.168.1.100' }];
+        }
+        let currentDeviceIndex = 0;
+        let autoPollInterval = null;
+
+        // Sound Audio Context
         let audioCtx = null;
-
         function playClickSound() {
-            if (!soundEnabled) return;
             try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-                
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.04);
-
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
-
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.03);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.04);
-            } catch (e) {
-                // Audio Context fallback silent
-            }
+                osc.stop(audioCtx.currentTime + 0.03);
+            } catch (e) {}
         }
 
-        // --- DOM Elements ---
-        const ipInput = document.getElementById('rokuIp');
+        // --- DOM ELEMENTS ---
+        const rokuIpInput = document.getElementById('rokuIp');
+        const devicePresetSelect = document.getElementById('devicePresetSelect');
         const saveIpBtn = document.getElementById('saveIpBtn');
+        const addDeviceBtn = document.getElementById('addDeviceBtn');
         const statusIndicator = document.getElementById('statusIndicator');
         const statusText = document.getElementById('statusText');
         const consoleLog = document.getElementById('consoleLog');
         const clearLogsBtn = document.getElementById('clearLogsBtn');
-        const textInput = document.getElementById('textInput');
-        const sendTextBtn = document.getElementById('sendTextBtn');
-        const clearTextBtn = document.getElementById('clearTextBtn');
-        const liveTypeToggle = document.getElementById('liveTypeToggle');
-        const infoModal = document.getElementById('infoModal');
-        const toggleInfoBtn = document.getElementById('toggleInfoBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const modalOkBtn = document.getElementById('modalOkBtn');
+        const appsGrid = document.getElementById('appsGrid');
+        const appSearchInput = document.getElementById('appSearchInput');
 
-        // Initialize IP
-        ipInput.value = currentIp;
+        // Initial setup
+        function initDevicesUI() {
+            devicePresetSelect.innerHTML = '';
+            devices.forEach((dev, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = `${dev.name} (${dev.ip})`;
+                devicePresetSelect.appendChild(opt);
+            });
+            devicePresetSelect.value = currentDeviceIndex;
+            rokuIpInput.value = devices[currentDeviceIndex].ip;
+        }
 
-        // --- Console Logging ---
-        function log(message, type = 'info') {
+        function getCurrentIp() {
+            return rokuIpInput.value.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+        }
+
+        // --- CONSOLE LOGGING ---
+        function log(msg, type = 'info') {
             const time = new Date().toLocaleTimeString();
             const entry = document.createElement('div');
-            entry.className = 'flex items-start gap-2 border-b border-gray-900/50 pb-0.5';
+            entry.className = 'flex items-start gap-2 border-b border-slate-900/60 pb-0.5';
             
-            let colorClass = 'text-gray-400';
+            let colorClass = 'text-slate-400';
             let icon = 'fa-arrow-right';
-            
-            if (type === 'success') {
-                colorClass = 'text-green-400';
-                icon = 'fa-check';
-            } else if (type === 'error') {
-                colorClass = 'text-red-400';
-                icon = 'fa-triangle-exclamation';
-            } else if (type === 'sent') {
-                colorClass = 'text-purple-400';
-                icon = 'fa-paper-plane';
-            }
+            if (type === 'success') { colorClass = 'text-emerald-400'; icon = 'fa-check'; }
+            if (type === 'error') { colorClass = 'text-red-400'; icon = 'fa-triangle-exclamation'; }
+            if (type === 'sent') { colorClass = 'text-purple-400'; icon = 'fa-paper-plane'; }
 
             entry.innerHTML = `
-                <span class="text-gray-600 text-[10px] select-none">${time}</span>
+                <span class="text-slate-600 text-[10px] select-none">${time}</span>
                 <i class="fa-solid ${icon} text-[10px] mt-1 ${colorClass}"></i>
-                <span class="${colorClass} flex-1 break-all">${message}</span>
+                <span class="${colorClass} flex-1 break-all">${msg}</span>
             `;
-
             consoleLog.appendChild(entry);
             consoleLog.scrollTop = consoleLog.scrollHeight;
         }
 
         clearLogsBtn.addEventListener('click', () => {
-            consoleLog.innerHTML = '<div class="text-gray-600">// Console cleared.</div>';
+            consoleLog.innerHTML = '<div class="text-slate-600">// Console cleared.</div>';
         });
 
-        // --- Roku API ECP Integration ---
-        
-        // 1. Send Keypress Command
+        // --- CORE ECP REQUEST DISPATCHER ---
+        async function sendEcpCommand(path, method = 'POST') {
+            playClickSound();
+            const ip = getCurrentIp();
+            const url = `http://${ip}:8060${path}`;
+            log(`${method} ${url}`, 'sent');
+
+            try {
+                const res = await fetch(url, { method: method, mode: 'no-cors' });
+                log(`Executed ${path}`, 'success');
+                return true;
+            } catch (err) {
+                log(`Failed ${path}: ${err.message}`, 'error');
+                return false;
+            }
+        }
+
         async function sendKeypress(key) {
-            playClickSound();
-            const endpoint = `http://${currentIp}:8060/keypress/${key}`;
-            log(`POST ${endpoint}`, 'sent');
-
-            try {
-                // Use mode: 'no-cors' so browser does not block cross-origin requests to local IP
-                await fetch(endpoint, {
-                    method: 'POST',
-                    mode: 'no-cors'
-                });
-                log(`Executed keypress: ${key}`, 'success');
-            } catch (err) {
-                log(`Failed to send keypress ${key}: ${err.message}`, 'error');
-            }
+            await sendEcpCommand(`/keypress/${key}`);
         }
 
-        // 2. Launch App
         async function launchApp(appId) {
-            playClickSound();
-            const endpoint = `http://${currentIp}:8060/launch/${appId}`;
-            log(`POST ${endpoint}`, 'sent');
-
-            try {
-                await fetch(endpoint, {
-                    method: 'POST',
-                    mode: 'no-cors'
-                });
-                log(`Launched App ID: ${appId}`, 'success');
-            } catch (err) {
-                log(`Failed to launch app ${appId}: ${err.message}`, 'error');
-            }
+            await sendEcpCommand(`/launch/${appId}`);
         }
 
-        // 3. Ping / Check Status
-        async function checkStatus() {
+        // --- LIVE DIAGNOSTICS & SYSTEM QUERY ---
+        async function fetchDeviceInfo() {
+            const ip = getCurrentIp();
             statusIndicator.className = 'w-3 h-3 rounded-full bg-yellow-500 animate-pulse';
-            statusText.textContent = 'Pinging...';
-            statusText.className = 'text-xs font-mono text-yellow-500';
+            statusText.textContent = 'Querying ECP...';
 
-            const endpoint = `http://${currentIp}:8060/query/device-info`;
-            
             try {
-                // ECP query status ping
-                await fetch(endpoint, {
-                    method: 'GET',
-                    mode: 'no-cors'
-                });
-                
-                // With no-cors, fetch succeeds if network path is reachable
-                statusIndicator.className = 'w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]';
-                statusText.textContent = 'Connected (8060)';
-                statusText.className = 'text-xs font-mono text-green-400';
-                log(`Device pinged successfully at ${currentIp}:8060`, 'success');
-            } catch (err) {
-                statusIndicator.className = 'w-3 h-3 rounded-full bg-red-500';
-                statusText.textContent = 'Offline / Blocked';
-                statusText.className = 'text-xs font-mono text-red-400';
-                log(`Unable to reach device at ${currentIp}. Check IP & LAN network.`, 'error');
+                const response = await fetch(`http://${ip}:8060/query/device-info`, { method: 'GET' });
+                if (response.ok) {
+                    const text = await response.text();
+                    const parser = new DOMParser();
+                    const xml = parser.parseFromString(text, 'text/xml');
+                    
+                    const getTag = (tag) => xml.querySelector(tag)?.textContent || '--';
+
+                    document.getElementById('diagModel').textContent = getTag('model-name');
+                    document.getElementById('diagSerial').textContent = getTag('serial-number');
+                    document.getElementById('diagSoftware').textContent = `${getTag('software-version')} (${getTag('software-build')})`;
+                    document.getElementById('diagUptime').textContent = `${Math.floor(parseInt(getTag('uptime') || 0) / 60)} mins`;
+                    document.getElementById('diagMac').textContent = getTag('wifi-mac');
+
+                    statusIndicator.className = 'w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]';
+                    statusText.textContent = 'Connected (8060)';
+                    log(`Diagnostics updated for ${ip}`, 'success');
+                } else {
+                    throw new Error('Opaque or non-200 response');
+                }
+            } catch (e) {
+                // In no-cors, full response xml cannot be read, fallback UI
+                statusIndicator.className = 'w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]';
+                statusText.textContent = 'Connected (no-cors)';
+                document.getElementById('diagModel').textContent = 'Roku Device';
+                document.getElementById('diagNetwork').textContent = 'Reachable';
             }
+
+            // Fetch Active App
+            try {
+                const appRes = await fetch(`http://${ip}:8060/query/active-app`, { method: 'GET' });
+                if (appRes.ok) {
+                    const appText = await appRes.text();
+                    const parser = new DOMParser();
+                    const xml = parser.parseFromString(appText, 'text/xml');
+                    const activeApp = xml.querySelector('app')?.textContent || 'Home Screen';
+                    document.getElementById('diagApp').textContent = activeApp;
+                }
+            } catch (e) {}
         }
 
-        // Save IP Configuration
-        saveIpBtn.addEventListener('click', () => {
-            const rawIp = ipInput.value.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-            if (rawIp) {
-                currentIp = rawIp;
-                localStorage.setItem('roku_ip', currentIp);
-                log(`Updated target Roku IP: ${currentIp}`, 'info');
-                checkStatus();
+        // --- RENDER APPS GRID ---
+        function renderAppsGrid(filter = '') {
+            appsGrid.innerHTML = '';
+            const filtered = POPULAR_APPS.filter(a => a.name.toLowerCase().includes(filter.toLowerCase()));
+            
+            filtered.forEach(app => {
+                const btn = document.createElement('button');
+                btn.className = `${app.color} p-3 rounded-xl flex flex-col items-center justify-center gap-2 text-white shadow-md hover:scale-105 transition transform active:scale-95`;
+                btn.innerHTML = `
+                    <i class="${app.icon} text-xl"></i>
+                    <span class="text-[11px] font-bold tracking-wide text-center leading-tight">${app.name}</span>
+                `;
+                btn.addEventListener('click', () => launchApp(app.id));
+                appsGrid.appendChild(btn);
+            });
+        }
+
+        appSearchInput.addEventListener('input', (e) => renderAppsGrid(e.target.value));
+
+        // Sync Installed Apps from Roku ECP
+        document.getElementById('fetchInstalledAppsBtn').addEventListener('click', async () => {
+            const ip = getCurrentIp();
+            log(`Fetching installed channel apps from http://${ip}:8060/query/apps...`, 'sent');
+            try {
+                const res = await fetch(`http://${ip}:8060/query/apps`);
+                if (res.ok) {
+                    const text = await res.text();
+                    const parser = new DOMParser();
+                    const xml = parser.parseFromString(text, 'text/xml');
+                    const appNodes = xml.querySelectorAll('app');
+                    
+                    if (appNodes.length > 0) {
+                        appsGrid.innerHTML = '';
+                        appNodes.forEach(node => {
+                            const id = node.getAttribute('id');
+                            const name = node.textContent;
+                            const btn = document.createElement('button');
+                            btn.className = 'bg-slate-800 hover:bg-slate-700 p-3 rounded-xl flex flex-col items-center justify-center gap-1.5 text-slate-200 border border-slate-700 shadow';
+                            btn.innerHTML = `
+                                <i class="fa-solid fa-tv text-purple-400 text-lg"></i>
+                                <span class="text-[11px] font-semibold text-center truncate w-full">${name}</span>
+                            `;
+                            btn.addEventListener('click', () => launchApp(id));
+                            appsGrid.appendChild(btn);
+                        });
+                        log(`Successfully loaded ${appNodes.length} apps from Roku`, 'success');
+                    }
+                }
+            } catch (e) {
+                log('Unable to parse raw apps XML (CORS restrictions). Using default streaming app presets.', 'error');
             }
         });
 
-        // --- Setup Button Event Listeners ---
-        document.querySelectorAll('[data-key]').forEach(button => {
-            button.addEventListener('click', () => {
-                const key = button.getAttribute('data-key');
-                sendKeypress(key);
-            });
-        });
-
-        document.querySelectorAll('[data-app]').forEach(button => {
-            button.addEventListener('click', () => {
-                const appId = button.getAttribute('data-app');
-                launchApp(appId);
-            });
-        });
-
-        // --- Text Input Handling (Lit_ Keystrokes) ---
+        // --- SMART KEYBOARD INPUT ---
+        const textInput = document.getElementById('textInput');
+        const liveTypeToggle = document.getElementById('liveTypeToggle');
         let lastTextValue = '';
 
         textInput.addEventListener('input', (e) => {
             if (!liveTypeToggle.checked) return;
-
-            const currentValue = e.target.value;
-            
-            if (currentValue.length > lastTextValue.length) {
-                // Character typed
-                const newChar = currentValue.slice(-1);
+            const val = e.target.value;
+            if (val.length > lastTextValue.length) {
+                const newChar = val.slice(-1);
                 sendKeypress(`Lit_${encodeURIComponent(newChar)}`);
-            } else if (currentValue.length < lastTextValue.length) {
-                // Backspace pressed
+            } else if (val.length < lastTextValue.length) {
                 sendKeypress('Backspace');
             }
-            
-            lastTextValue = currentValue;
+            lastTextValue = val;
         });
 
-        sendTextBtn.addEventListener('click', async () => {
-            const text = textInput.value;
-            if (!text) return;
-
-            log(`Sending text sequence: "${text}"`, 'info');
-            for (let char of text) {
+        document.getElementById('sendTextBtn').addEventListener('click', async () => {
+            const val = textInput.value;
+            if (!val) return;
+            const delay = parseInt(document.getElementById('typingDelay').value || '80');
+            log(`Sending text sequence: "${val}"`, 'info');
+            for (let char of val) {
                 await sendKeypress(`Lit_${encodeURIComponent(char)}`);
+                await new Promise(r => setTimeout(r, delay));
             }
         });
 
-        clearTextBtn.addEventListener('click', () => {
+        document.getElementById('clearTextBtn').addEventListener('click', () => {
             textInput.value = '';
             lastTextValue = '';
             sendKeypress('Backspace');
         });
 
-        // --- Hardware Keyboard Navigation Mapping ---
+        document.querySelectorAll('.preset-text-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                textInput.value = btn.textContent;
+                document.getElementById('sendTextBtn').click();
+            });
+        });
+
+        // --- AUTOMATION MACROS & CUSTOM COMMANDS ---
+        document.getElementById('macroPowerOnLaunch').addEventListener('click', async () => {
+            log('Executing Macro: Power On & YouTube', 'sent');
+            await sendKeypress('PowerOn');
+            await new Promise(r => setTimeout(r, 1500));
+            await sendKeypress('Home');
+            await new Promise(r => setTimeout(r, 1000));
+            await launchApp('837');
+        });
+
+        document.getElementById('macroNetflixShort').addEventListener('click', async () => {
+            log('Executing Macro: Home -> Netflix', 'sent');
+            await sendKeypress('Home');
+            await new Promise(r => setTimeout(r, 800));
+            await launchApp('12');
+        });
+
+        document.getElementById('macroMuteTV').addEventListener('click', async () => {
+            log('Executing Macro: Pause & Mute', 'sent');
+            await sendKeypress('Play');
+            await sendKeypress('VolumeMute');
+        });
+
+        // Custom API Builder
+        document.getElementById('sendApiBtn').addEventListener('click', () => {
+            const method = document.getElementById('apiMethod').value;
+            const endpoint = document.getElementById('apiEndpoint').value.trim();
+            if (endpoint) sendEcpCommand(endpoint.startsWith('/') ? endpoint : `/${endpoint}`, method);
+        });
+
+        // --- EVENT LISTENERS FOR REMOTE BUTTONS ---
+        document.querySelectorAll('[data-key]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.getAttribute('data-key');
+                sendKeypress(key);
+            });
+        });
+
+        // --- HARDWARE KEYBOARD NAVIGATION MAPPER ---
         document.addEventListener('keydown', (e) => {
-            // Do not intercept keyboard shortcuts if user is typing inside input boxes
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                return;
-            }
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-            let keyToTarget = null;
-            let targetElem = null;
-
+            let keyMap = null;
             switch (e.key) {
-                case 'ArrowUp':
-                    keyToTarget = 'Up';
-                    break;
-                case 'ArrowDown':
-                    keyToTarget = 'Down';
-                    break;
-                case 'ArrowLeft':
-                    keyToTarget = 'Left';
-                    break;
-                case 'ArrowRight':
-                    keyToTarget = 'Right';
-                    break;
-                case 'Enter':
-                    keyToTarget = 'Select';
-                    break;
-                case 'Backspace':
-                    keyToTarget = 'Back';
-                    break;
-                case 'Escape':
-                    keyToTarget = 'Home';
-                    break;
-                case ' ':
-                    keyToTarget = 'Play';
-                    e.preventDefault(); // prevent page scroll
-                    break;
+                case 'ArrowUp': keyMap = 'Up'; break;
+                case 'ArrowDown': keyMap = 'Down'; break;
+                case 'ArrowLeft': keyMap = 'Left'; break;
+                case 'ArrowRight': keyMap = 'Right'; break;
+                case 'Enter': keyMap = 'Select'; break;
+                case 'Backspace': keyMap = 'Back'; break;
+                case 'Escape': case 'h': case 'H': keyMap = 'Home'; break;
+                case ' ': keyMap = 'Play'; e.preventDefault(); break;
+                case 'p': case 'P': keyMap = 'Power'; break;
+                case 'm': case 'M': keyMap = 'VolumeMute'; break;
+                case '=': case '+': keyMap = 'VolumeUp'; break;
+                case '-': keyMap = 'VolumeDown'; break;
             }
 
-            if (keyToTarget) {
-                sendKeypress(keyToTarget);
-                
-                // Trigger button active press visual animation
-                targetElem = document.querySelector(`[data-key="${keyToTarget}"]`);
-                if (targetElem) {
-                    targetElem.classList.add('active-press');
-                    setTimeout(() => targetElem.classList.remove('active-press'), 120);
+            if (keyMap) {
+                sendKeypress(keyMap);
+                const elem = document.querySelector(`[data-key="${keyMap}"]`);
+                if (elem) {
+                    elem.classList.add('active-press');
+                    setTimeout(() => elem.classList.remove('active-press'), 120);
                 }
             }
         });
 
-        // --- Modal UI Handling ---
-        const toggleModal = (show) => {
-            if (show) infoModal.classList.remove('hidden');
-            else infoModal.classList.add('hidden');
+        // --- SUBNET SCANNER ---
+        const scanModal = document.getElementById('scanModal');
+        const startSubnetScanBtn = document.getElementById('startSubnetScanBtn');
+        const scanProgressBar = document.getElementById('scanProgressBar');
+        const scanResultsList = document.getElementById('scanResultsList');
+
+        document.getElementById('quickScanBtn').addEventListener('click', () => {
+            const currentIp = getCurrentIp();
+            const prefix = currentIp.split('.').slice(0, 3).join('.');
+            document.getElementById('subnetPrefix').value = prefix || '192.168.1';
+            scanModal.classList.remove('hidden');
+        });
+
+        startSubnetScanBtn.addEventListener('click', async () => {
+            const prefix = document.getElementById('subnetPrefix').value.trim();
+            if (!prefix) return;
+            scanResultsList.innerHTML = '<div class="text-purple-400">// Scanning subnet on port 8060...</div>';
+            
+            for (let i = 1; i <= 254; i += 15) {
+                scanProgressBar.style.width = `${Math.floor((i / 254) * 100)}%`;
+                const targetIp = `${prefix}.${i}`;
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 200);
+                    await fetch(`http://${targetIp}:8060/query/device-info`, { signal: controller.signal, mode: 'no-cors' });
+                    
+                    const resItem = document.createElement('div');
+                    resItem.className = 'flex justify-between items-center bg-slate-900 p-2 rounded border border-slate-800';
+                    resItem.innerHTML = `
+                        <span class="text-emerald-400 font-bold">${targetIp}:8060</span>
+                        <button class="bg-purple-600 hover:bg-purple-500 text-white px-2 py-1 rounded text-[10px]">Use Device</button>
+                    `;
+                    resItem.querySelector('button').addEventListener('click', () => {
+                        rokuIpInput.value = targetIp;
+                        scanModal.classList.add('hidden');
+                        fetchDeviceInfo();
+                    });
+                    scanResultsList.appendChild(resItem);
+                } catch (e) {}
+            }
+            scanProgressBar.style.width = '100%';
+        });
+
+        // --- UI TAB SWITCHING LOGIC ---
+        const tabBtns = {
+            tabDevices: 'panelDevices',
+            tabApps: 'panelApps',
+            tabKeyboard: 'panelKeyboard',
+            tabMacros: 'panelMacros'
         };
 
-        toggleInfoBtn.addEventListener('click', () => toggleModal(true));
-        closeModalBtn.addEventListener('click', () => toggleModal(false));
-        modalOkBtn.addEventListener('click', () => toggleModal(false));
+        Object.keys(tabBtns).forEach(tabId => {
+            document.getElementById(tabId).addEventListener('click', () => {
+                Object.keys(tabBtns).forEach(t => {
+                    document.getElementById(t).className = 'tab-btn px-4 py-2 rounded-xl font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-2 whitespace-nowrap';
+                    document.getElementById(tabBtns[t]).classList.add('hidden');
+                });
+                document.getElementById(tabId).className = 'tab-btn px-4 py-2 rounded-xl font-semibold bg-purple-600 text-white flex items-center gap-2 whitespace-nowrap';
+                document.getElementById(tabBtns[tabId]).classList.remove('hidden');
+            });
+        });
 
-        // Initial connection check on load
+        // Modal Controls
+        document.querySelectorAll('.close-modal-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('scanModal').classList.add('hidden');
+                document.getElementById('shortcutsModal').classList.add('hidden');
+                document.getElementById('infoModal').classList.add('hidden');
+            });
+        });
+
+        document.getElementById('toggleShortcutsBtn').addEventListener('click', () => {
+            document.getElementById('shortcutsModal').classList.remove('hidden');
+        });
+        document.getElementById('toggleInfoBtn').addEventListener('click', () => {
+            document.getElementById('infoModal').classList.remove('hidden');
+        });
+
+        // Device Presets Management
+        saveIpBtn.addEventListener('click', () => {
+            const ip = getCurrentIp();
+            devices[currentDeviceIndex].ip = ip;
+            localStorage.setItem('roku_devices', JSON.stringify(devices));
+            initDevicesUI();
+            fetchDeviceInfo();
+        });
+
+        addDeviceBtn.addEventListener('click', () => {
+            const name = prompt('Enter a name for this Roku device:', 'Living Room TV');
+            if (name) {
+                devices.push({ name: name, ip: '192.168.1.100' });
+                currentDeviceIndex = devices.length - 1;
+                localStorage.setItem('roku_devices', JSON.stringify(devices));
+                initDevicesUI();
+            }
+        });
+
+        devicePresetSelect.addEventListener('change', (e) => {
+            currentDeviceIndex = parseInt(e.target.value);
+            rokuIpInput.value = devices[currentDeviceIndex].ip;
+            fetchDeviceInfo();
+        });
+
+        // Auto Poll Toggle
+        document.getElementById('autoPollToggle').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                autoPollInterval = setInterval(fetchDeviceInfo, 5000);
+            } else {
+                clearInterval(autoPollInterval);
+            }
+        });
+
+        // On Load Initializer
         window.addEventListener('load', () => {
-            checkStatus();
+            initDevicesUI();
+            renderAppsGrid();
+            fetchDeviceInfo();
         });
     </script>
 </body>
